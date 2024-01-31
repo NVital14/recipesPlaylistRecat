@@ -16,6 +16,9 @@
   height: 100%;
 }
 
+.scrollable{
+
+}
 
 
 .box-shadow {
@@ -103,4 +106,14 @@
 .active {
   background-color: #f7c3cb;
   color: #ffffff;
+}
+
+.btnClearFilter{
+  margin: 3px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  color: #e68c9a;
+  border-radius: 5px;
+  transition: color 0.3s, border-color 0.3s;
 }

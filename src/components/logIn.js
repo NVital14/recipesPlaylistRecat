@@ -5,12 +5,11 @@ import { auth } from '../firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import rpImg from '../images/recipesPlaylist.png';
 import { useNavigate } from 'react-router-dom'
-import { AuthContext, ROUTES } from '../App';
+import { ROUTES } from '../App';
 
 
 
 const LogIn = ({ email, setEmail, passord, setPassword }) => {
-    const user = useContext(AuthContext);
     const navigate = useNavigate();
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight);
@@ -35,11 +34,6 @@ const LogIn = ({ email, setEmail, passord, setPassword }) => {
         // navigate(ROUTES.RECEITAS);
         try {
              await signInWithEmailAndPassword(auth, email, passord);
-            const curUser = auth.currentUser.uid;
-            user.setUser(structuredClone(curUser));
-
-            console.log(auth.currentUser.uid);
-            console.log(user.user);
             navigate(ROUTES.INICIO);
         } catch (error) {
             alert('ERRO' + error);

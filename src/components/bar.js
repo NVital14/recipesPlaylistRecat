@@ -10,7 +10,15 @@ import { ROUTES } from '../App';
 
 function AppBar({admin, user}) {
     const navigate = useNavigate();
-
+    const isAdmin = isUserAdmin();
+    function isUserAdmin() {
+        for (let i = 0; i < admin.length; i++){
+            if (admin[i].userId === user) {
+                return true;
+            }
+        }
+        return false;
+    }
     return (
 
         <div className="App">
@@ -20,7 +28,10 @@ function AppBar({admin, user}) {
                     <>
                         <StandardListItem data-key="1">Início</StandardListItem>
                         <StandardListItem data-key="2">Favoritos</StandardListItem>
-                        {user === admin[0]?.userId ? <StandardListItem data-key="3">Receitas</StandardListItem> : null}
+                        {isAdmin ?
+                            
+                            // user === admin[0]?.userId ?
+                        <StandardListItem data-key="3">Receitas</StandardListItem> : null}
                         <StandardListItem data-key="4">Sair</StandardListItem></>}
                 onMenuItemClick={async (e) => {
                     console.log(e.detail.item.dataset.key);

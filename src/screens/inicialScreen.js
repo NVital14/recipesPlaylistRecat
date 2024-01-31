@@ -1,22 +1,21 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import '../firebaseConfig';
-import { app, auth } from '../firebaseConfig';
-import { getFirestore, collection, getDocs, query, where, firestore } from "firebase/firestore";
+import { auth } from '../firebaseConfig';
+import { getFirestore, collection, getDocs, query, where } from "firebase/firestore";
+import { useNavigate } from 'react-router-dom';
 import rpImg from '../images/rp.png';
 import RecipeItem from '../components/recipeItem';
-import NewRecipe from './newRecipe';
 import FilterButton from '../components/filterButton';
 import ViewRecipe from '../components/viewRecipe';
 import AppBar from '../components/bar';
-import { AuthContext } from '../App';
 import Pagination from '../components/pagination';
-import { async } from '@firebase/util';
+import { ROUTES } from '../App';
 
 
 
 function InicialScreen() {
   // const user = useContext(AuthContext);
-  const user = auth.currentUser.uid;
+  let user = useRef();
   const [storedRecipes, setStoredRecipes] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -32,8 +31,33 @@ function InicialScreen() {
   const lastRecipeIndex = currentPage * recipesPerPage;
   const firstRecipeIndex = lastRecipeIndex - recipesPerPage;
   const currentRecipes = storedRecipes.slice(firstRecipeIndex, lastRecipeIndex);
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if (auth.currentUser == null) {
+      navigate(ROUTES.LOG_IN);
+    }
+    else {
+      user.current = auth.currentUser.uid;
+      inic();
+      window.addEventListener('resize', () => { setWidth(window.innerWidth) });
+
+      return () => {
+        window.removeEventListener('resize', () => { setWidth(window.innerWidth) });
+      };
+    }
+
+  }, [])
+
+  useEffect(() => {
+    if (auth.currentUser != null) {
+      whenViewRecipeIsOpen();
+    }
+  }, [isOpen])
 
   const fetchDataFromFirestore = async (col, set) => {
+    
     const querySnapshot = await getDocs(collection(db, col));
     const temporaryArr = [];
     querySnapshot.forEach((doc) => {
@@ -44,7 +68,7 @@ function InicialScreen() {
   };
 
   const fetchFavoritesFromFirestore = async () => {
-    const querySnapshot = await getDocs(query(collection(db, "favorites"), where('userId', '==', user)));
+    const querySnapshot = await getDocs(query(collection(db, "favorites"), where('userId', '==', user.current)));
     const temporaryArr = [];
     querySnapshot.forEach((doc) => {
       temporaryArr.push(doc.data());
@@ -75,56 +99,48 @@ function InicialScreen() {
     await fetchFavoritesFromFirestore();
     isTheRecipeAFavorite();
   }
-  useEffect(() => {
-    inic();
-
-    window.addEventListener('resize', () => { setWidth(window.innerWidth) });
-
-    return () => {
-      window.removeEventListener('resize', () => { setWidth(window.innerWidth) });
-    };
-  }, [])
 
 
-  useEffect(() => {
-    whenViewRecipeIsOpen();
-  }, [isOpen])
 
   return (
 
     <div className="App">
-      <AppBar admin={admin} user={user}></AppBar>
-      <center>
-        <img src={rpImg} style={ {width:width <= 1050 ? '100%':width <= 1300 ?'70%':width <= 1800 ?'60%':'45%'}} />
-        <div style={{ display: 'flex', width: width <= 1050 ? '100%':width <= 1800 ?'70%':'50%' , marginTop: '4%', alignItems:'center' }}>
+      <AppBar admin={admin} user={user.current}></AppBar>
+      <div className='scrollable' style={{ height: 'calc(100vh - 52px)', overflowY: 'auto' }} >
+        <center>
+          <img src={rpImg} style={{ width: width <= 1050 ? '100%' : width <= 1300 ? '70%' : width <= 1800 ? '60%' : '45%' }} />
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: width <= 1050 ? '100%' : width <= 1800 ? '70%' : '45%', marginTop: '4%' }}>
 
-          <FilterButton category="Aperitivo" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-          <FilterButton category="Entrada" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-          <FilterButton category="Sopa" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-          <FilterButton category="Peixe" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-          <FilterButton category="Sobremesa" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-          <FilterButton category="Vegetariano" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-          <FilterButton category="Vegan" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-          <FilterButton category="Bebida" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
-        </div>
+            <FilterButton category="Aperitivo" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
+            <FilterButton category="Entrada" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
+            <FilterButton category="Sopa" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
+            <FilterButton category="Peixe" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
+            <FilterButton category="Sobremesa" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
+            <FilterButton category="Vegetariano" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
+            <FilterButton category="Vegan" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
+            <FilterButton category="Bebida" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
 
-        <div style={{
-          width:  width <= 800 ? '100%':'720px' 
-        }}>
+          </div>
+          <div><FilterButton category="Limpar" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton></div>
+          <div style={{
+            width: width <= 800 ? '100%' : '720px'
+          }}>
 
-          {currentRecipes.map((item, index) => (
-            <RecipeItem key={item.id} item={item} isOpen={isOpen} setIsOpen={setIsOpen} setSelected={setSelected}> </RecipeItem>))}
-        </div>
+            {currentRecipes.map((item, index) => (
+              <RecipeItem key={item.id} item={item} isOpen={isOpen} setIsOpen={setIsOpen} setSelected={setSelected}> </RecipeItem>))}
+          </div>
 
-        <ViewRecipe isOpen={isOpen} setIsOpen={setIsOpen} data={selected}
-          isFavorite={isFavorite} setIsFavorite={setIsFavorite} user={user} btnFavorite={true} />
-        <Pagination
-          totalRecipes={storedRecipes.length}
-          recipesPerPage={recipesPerPage}
-          setCurrentPage={setCurrentPage}
-          currentPage={currentPage}
-        ></Pagination>
-      </center >
+          <ViewRecipe isOpen={isOpen} setIsOpen={setIsOpen} data={selected}
+            isFavorite={isFavorite} setIsFavorite={setIsFavorite} user={user.current} btnFavorite={true} />
+          <Pagination
+            totalRecipes={storedRecipes.length}
+            recipesPerPage={recipesPerPage}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+          ></Pagination>
+        </center >
+      </div>
+
     </div >
 
   );

@@ -11,18 +11,29 @@ const FilterButton = (props) => {
 
     async function getCategoryRecipes() {
 
-        const querySnapshot = await getDocs(query(collection(db, "myRecipes"), where('category', '==',  props.category )));
-        const temporaryArr = [];
-        querySnapshot.forEach((doc) => {
-            temporaryArr.push(doc.data());
-        });
-        props.setStoredRecipes(temporaryArr);
+        if (props.category == 'Limpar') {
+            const querySnapshot = await getDocs(collection(db, "myRecipes"));
+            const temporaryArr = [];
+            querySnapshot.forEach((doc) => {
+                temporaryArr.push(doc.data());
+            });
+            props.setStoredRecipes(temporaryArr);
 
+        }
+        else {
+            const querySnapshot = await getDocs(query(collection(db, "myRecipes"), where('category', '==', props.category)));
+            const temporaryArr = [];
+            querySnapshot.forEach((doc) => {
+                temporaryArr.push(doc.data());
+            });
+            props.setStoredRecipes(temporaryArr);
+        }
+ 
     }
 
 
     return (
-        <Button className='btnFilter' onClick={getCategoryRecipes} >{props.category}</Button>
+        < Button  className={props.category != 'Limpar'?'btnFilter':'btnClearFilter'} onClick = { getCategoryRecipes} icon={props.category == 'Limpar' ? 'clear-filter' : null}> { props.category }</Button >
 
     );
 

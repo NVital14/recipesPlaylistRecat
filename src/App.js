@@ -1,18 +1,8 @@
-import React, { createContext, useEffect, useState } from 'react';
+
 import './firebaseConfig';
-import { ShellBar, StandardListItem, Avatar, Input, Icon, Button } from '@ui5/webcomponents-react';
-import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
-import logoImg from './images/logo.png';
-import rpImg from './images/rp.png';
-import RecipeItem from './components/recipeItem';
-import NewRecipe from './screens/newRecipe';
-import FilterButton from './components/filterButton';
-import ViewRecipe from './components/viewRecipe';
-import SignUp from './components/signUp';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import SignUpScreen from './screens/signUpScreen';
 import InicialScreen from './screens/inicialScreen';
-import LogIn from './components/logIn';
 import LogInScreen from './screens/logInScreen';
 import FavoritesScreen from './screens/favoritesScreen';
 import CRUDScreen from './screens/crudScreen';
@@ -26,41 +16,25 @@ export const ROUTES = {
   CRUD: '/crud'
 }
 
-export const AuthContext = createContext({
-  user: null,
-  setUser: () => { }
-})
 
 
 function App() {
-  // state oara atuencicao
-  const [authData, setAuthData] = useState({ user: null });
-
-    const setUser = (user) => {
-      setAuthData((data) => ({ ...data, user: user }))
-    }
-
 
   return (
-    <AuthContext.Provider value={{ ...authData, setUser }}>
-      <HashRouter>
-        <Routes>
-          {/* {isAuthenticated ? <>
-        
-        
-        </> : <>
-        
-        </>} */}
-          <Route path='/' element={<LogInScreen />} />
-          <Route key={ROUTES.LOG_IN} path={ROUTES.LOG_IN} element={<LogInScreen />} />
-          <Route key={ROUTES.SIGN_UP} path={ROUTES.SIGN_UP} element={<SignUpScreen />} />
-          <Route key={ROUTES.INICIO} path={ROUTES.INICIO} element={<InicialScreen />} />
-          <Route key={ROUTES.FAVORITES} path={ROUTES.FAVORITES} element={<FavoritesScreen />} />
-          <Route key={ROUTES.CRUD} path={ROUTES.CRUD} element={<CRUDScreen />} />
 
-        </Routes>
-      </HashRouter>
-    </AuthContext.Provider>
+    <HashRouter>
+      <Routes>
+        
+        <Route path='/' element={<LogInScreen />} />
+        <Route key={ROUTES.LOG_IN} path={ROUTES.LOG_IN} element={<LogInScreen />} />
+        <Route key={ROUTES.SIGN_UP} path={ROUTES.SIGN_UP} element={<SignUpScreen />} />
+        <Route key={ROUTES.INICIO} path={ROUTES.INICIO} element={<InicialScreen />} />
+        <Route key={ROUTES.FAVORITES} path={ROUTES.FAVORITES} element={<FavoritesScreen />} />
+        <Route key={ROUTES.CRUD} path={ROUTES.CRUD} element={<CRUDScreen />} />
+
+      </Routes>
+    </HashRouter>
+
   );
 
 
