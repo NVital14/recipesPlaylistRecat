@@ -1,0 +1,105 @@
+.App {
+  text-align: center;
+}
+
+
+@media only screen and (min-width: 600px) {
+
+  .signUpSize {
+    width: 100%
+  }
+}
+
+.divSignUpScreen {
+  background-color: #fffbfc;
+  width: 100%;
+  height: 100%;
+}
+
+
+
+.box-shadow {
+  background-color: #fffbfb;
+  height: 300px;
+  width: 700px;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 2px 2px 20px 23px #fff3f7;
+}
+
+.height-div {
+  height: 100px;
+}
+
+.labelText {
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+  line-height: 1.5;
+}
+
+.text {
+  font-size: 18px;
+  color: #333;
+}
+
+.recipe-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #202020;
+  text-transform: uppercase;
+  word-spacing: 1px;
+  letter-spacing: 2px;
+}
+
+
+.card {
+  border: outset;
+  border-color: antiquewhite;
+}
+
+.btnFilter {
+  width: 110px;
+  margin: 3px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  /* Removendo o sublinhado padrão do link */
+  border: 2px solid #e68c9a;
+  color: #f7c3cb;
+  border-radius: 5px;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+
+.btnOthers {
+  margin: 3px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  color: #e68c9a;
+  border-radius: 5px;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.btnAddRecipe {
+  margin: 3px;
+  padding: 2px;
+  font-size: 25px;
+  text-align: center;
+  width: 300px;
+  height: 50px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-radius: 5px 25px;
+  color: #f7c3cb;
+}
+
+.active {
+  background-color: #f7c3cb;
+  color: #ffffff;
+}
