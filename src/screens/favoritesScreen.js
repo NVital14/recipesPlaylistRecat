@@ -20,6 +20,9 @@ function FavoritesScreen() {
     const [selected, setSelected] = useState(null);
     const [isFavorite, setIsFavorite] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
+
+    const [width, setWidth] = useState(window.innerWidth);
+    const [height, setHeight] = useState(window.innerHeight);
     const [admin, setAdmin] = useState([]);
     const db = getFirestore();
 
@@ -59,6 +62,15 @@ function FavoritesScreen() {
     }
     useEffect(() => {
         inic();
+
+        window.addEventListener('resize', () => { setWidth(window.innerWidth) });
+        window.addEventListener('resize', () => { setHeight(window.innerHeight) });
+
+        return () => {
+            window.removeEventListener('resize', () => { setWidth(window.innerWidth) });
+            window.removeEventListener('resize', () => { setHeight(window.innerHeight) });
+
+        };
     }, [])
 
     useEffect(() => {
@@ -74,7 +86,7 @@ function FavoritesScreen() {
             {favorites.length >= 1 ?
                 <center>
                     <div style={{
-                        width: '720px'
+                        width:  width <= 800 ? '100%':'720px' 
                     }}>
                         {favorites.map((item) =>
                         (storedRecipes

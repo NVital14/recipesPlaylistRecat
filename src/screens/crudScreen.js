@@ -17,6 +17,7 @@ function CRUDScreen() {
     const [selected, setSelected] = useState(null);
     const [isFavorite, setIsFavorite] = useState(false); //aqui não é usado para nada, simplesmente para enviar os parâmetros
     const [admin, setAdmin] = useState([]);
+    const [width, setWidth] = useState(window.innerWidth);
 
     const db = getFirestore();
 
@@ -42,6 +43,13 @@ function CRUDScreen() {
 
         fetchDataFromFirestore("myRecipes", setStoredRecipes);
         fetchDataFromFirestore("admin", setAdmin);
+
+        
+        window.addEventListener('resize', () => { setWidth(window.innerWidth) });
+
+        return () => {
+            window.removeEventListener('resize', () => { setWidth(window.innerWidth) });
+        };
     }, [])
 
     useEffect(() => {
@@ -59,7 +67,7 @@ function CRUDScreen() {
             </div>
             <center>
                 <div style={{
-                    width: '720px',
+                    width:  width <= 800 ? '100%':'720px' 
                 }}>
 
                     {currentRecipes.map((item, index) => (

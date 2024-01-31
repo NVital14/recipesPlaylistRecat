@@ -1,12 +1,12 @@
 import '../App.css';
 import React, { useEffect, useState } from 'react';
 import { doc, query, getFirestore, addDoc, collection, updateDoc, where, getDocs, deleteDoc } from "firebase/firestore";
-import { TextArea, Button, Dialog, Bar, Form, FormItem, Input, Select, Option, Label, FormGroup } from '@ui5/webcomponents-react';
+import { TextArea, Button, Dialog, Bar, Form, FormItem, Input, Select, Option, Label, FormGroup, MessageBox, sap } from '@ui5/webcomponents-react';
 import { getStorage, getDownloadURL, ref, uploadBytesResumable, deleteObject } from 'firebase/storage';
 import '@ui5/webcomponents-icons/dist/AllIcons.js';
 import UploadAndDisplayImage from './uploadAndDisplayImage';
-import { async } from '@firebase/util';
-import DeleteAlert from './deleteAlert';
+
+
 
 
 const ViewRecipe = ({ isOpen, setIsOpen, data, isFavorite, setIsFavorite, user, btnFavorite, btnCRUD }) => {
@@ -19,8 +19,26 @@ const ViewRecipe = ({ isOpen, setIsOpen, data, isFavorite, setIsFavorite, user, 
     const [inputAffordability, setInputAffordability] = useState('');
     const [inputIngredients, setInputIngredients] = useState('');
     const [inputSteps, setInputSteps] = useState('');
-    const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState('false');
+    const [width, setWidth] = useState(window.innerWidth);
 
+    useEffect(() => {
+
+        window.addEventListener('resize', () => { setWidth(window.innerWidth) });
+
+        return () => {
+            window.removeEventListener('resize', () => { setWidth(window.innerWidth) });
+
+        };
+    }, []);
+    useEffect(() => {
+        setInputTitle(data?.title);
+        setInputTime(data?.time);
+        setInputCategory(data?.category);
+        setInputAffordability(data?.affordability);
+        setInputComplexity(data?.complexity);
+        setInputIngredients(data?.ingredients);
+        setInputSteps(data?.steps);
+    }, [isOpen])
 
     async function addOrDeleteFavorite() {
         if (!isFavorite) {
@@ -63,13 +81,12 @@ const ViewRecipe = ({ isOpen, setIsOpen, data, isFavorite, setIsFavorite, user, 
     }
 
     async function saveChanges() {
-        const db = getFirestore();
         const storage = getStorage();
         let url;
         try {
 
-            if (inputTitle != '' && inputTime != '' && inputIngredients != '' && inputSteps != '') {
-                if (selectedImage != null && data.image != null) {
+            if (inputTitle !== '' && inputTime !== '' && inputIngredients !== '' && inputSteps !== '') {
+                if (selectedImage !== null && data.image !== null) {
                     const imagePath = getPathStorageFromUrl(data.image);
                     const fileRef = ref(storage, imagePath);
                     await deleteObject(fileRef);
@@ -107,38 +124,49 @@ const ViewRecipe = ({ isOpen, setIsOpen, data, isFavorite, setIsFavorite, user, 
 
     // const deleteRecipe = async () => {
     async function deleteRecipe() {
-        try {
-            const myRecipesCollection = collection(db, 'myRecipes');
-            const q = query(myRecipesCollection, where('id', '==', data.id));
-            const querySnapshot = await getDocs(q);
 
-            querySnapshot.forEach(async (doc) => {
-                await deleteDoc(doc.ref);
-            });
-            setIsDeleteAlertOpen(false);
-            alert("Receita Eliminada com sucesso");
-            setIsOpen(false);
+        if (window.confirm('Tem a certeza que quer eliminar a receita?')) {
+            try {
+                
+                if (data.image != null) {
+                    const storage = getStorage();
+                    const imagePath = getPathStorageFromUrl(data.image);
+                    const fileRef = ref(storage, imagePath);
+                    await deleteObject(fileRef);
+                }
+                const myRecipesCollection = collection(db, 'myRecipes');
+                const q = query(myRecipesCollection, where('id', '==', data.id));
+                const querySnapshot = await getDocs(q);
 
-        } catch (error) {
+                querySnapshot.forEach(async (doc) => {
+                    await deleteDoc(doc.ref);
+                });
 
+                setIsOpen(false);
+                alert("Receita Eliminada com sucesso");
+
+
+            } catch (error) {
+                alert('Não foi possível eliminar a receita!');
+            }
+            console.log('Thing was saved to the database.');
+        } else {
+            // Do nothing!
+            console.log('Thing was not saved to the database.');
         }
 
+
     }
-    useEffect(() => {
-        setInputTitle(data?.title);
-        setInputTime(data?.time);
-        setInputCategory(data?.category);
-        setInputAffordability(data?.affordability);
-        setInputComplexity(data?.complexity);
-        setInputIngredients(data?.ingredients);
-        setInputSteps(data?.steps);
-    }, [isOpen])
+
+
 
     return (
         <Dialog
             open={isOpen}
             onAfterClose={() => setIsOpen(false)}
-            footer={<Bar design="Footer" endContent={<div>{btnFavorite ? <Button
+            footer={<Bar design="Footer" endContent={<div style={{
+                heigth: width <=1110 ? '100px': '30px'
+            }}>{btnFavorite ? <Button
                 className='btnOthers'
                 icon={isFavorite ? "favorite" : "add-favorite"}
                 onClick={() => addOrDeleteFavorite()}
@@ -155,11 +183,14 @@ const ViewRecipe = ({ isOpen, setIsOpen, data, isFavorite, setIsFavorite, user, 
                 {btnCRUD ? <Button
                     className='btnOthers'
                     icon="delete"
-                    onClick={() => { setIsDeleteAlertOpen(true) }}
+                    onClick={() => { deleteRecipe() }}
                 >
                     Eliminar
                 </Button> : null}
-                <Button className='btnOthers' onClick={() => setIsOpen(false)}>Fechar</Button></div>} />}
+                <Button className='btnOthers' onClick={() => {
+                    setIsOpen(false)
+                    setSelectedImage(null);
+                }}>Fechar</Button></div>} />}
             header={<p className='recipe-title'>{data?.title}</p>}
             style={{ width: '40%' }}
 
@@ -279,7 +310,7 @@ const ViewRecipe = ({ isOpen, setIsOpen, data, isFavorite, setIsFavorite, user, 
                         </FormGroup>
 
                     </Form>
-                    <DeleteAlert isOpen={isDeleteAlertOpen} setIsOpen={setIsDeleteAlertOpen} delete={deleteRecipe()}></DeleteAlert>
+
                 </div>
 
             }

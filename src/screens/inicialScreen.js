@@ -23,6 +23,7 @@ function InicialScreen() {
   const [isOpen, setIsOpen] = useState(false);
   const [admin, setAdmin] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [width, setWidth] = useState(window.innerWidth);
 
   const [currentPage, setCurrentPage] = useState(1);
   const recipesPerPage = 8;
@@ -67,16 +68,21 @@ function InicialScreen() {
   async function inic() {
     await fetchDataFromFirestore("myRecipes", setStoredRecipes);
     await fetchDataFromFirestore("admin", setAdmin);
-    await fetchFavoritesFromFirestore();    
+    await fetchFavoritesFromFirestore();
   }
-  
+
   async function whenViewRecipeIsOpen() {
-    await fetchFavoritesFromFirestore(); 
+    await fetchFavoritesFromFirestore();
     isTheRecipeAFavorite();
   }
   useEffect(() => {
-
     inic();
+
+    window.addEventListener('resize', () => { setWidth(window.innerWidth) });
+
+    return () => {
+      window.removeEventListener('resize', () => { setWidth(window.innerWidth) });
+    };
   }, [])
 
 
@@ -89,8 +95,8 @@ function InicialScreen() {
     <div className="App">
       <AppBar admin={admin} user={user}></AppBar>
       <center>
-        <img src={rpImg} />
-        <div style={{ display: 'flex', width: '50%', marginTop: '4%' }}>
+        <img src={rpImg} style={ {width:width <= 1050 ? '100%':width <= 1300 ?'70%':width <= 1800 ?'60%':'45%'}} />
+        <div style={{ display: 'flex', width: width <= 1050 ? '100%':width <= 1800 ?'70%':'50%' , marginTop: '4%', alignItems:'center' }}>
 
           <FilterButton category="Aperitivo" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
           <FilterButton category="Entrada" storedRecipes={storedRecipes} setStoredRecipes={setStoredRecipes}></FilterButton>
@@ -103,11 +109,11 @@ function InicialScreen() {
         </div>
 
         <div style={{
-          width: '720px'
+          width:  width <= 800 ? '100%':'720px' 
         }}>
 
           {currentRecipes.map((item, index) => (
-            <RecipeItem key={item.id}  item={item} isOpen={isOpen} setIsOpen={setIsOpen} setSelected={setSelected}> </RecipeItem>))}
+            <RecipeItem key={item.id} item={item} isOpen={isOpen} setIsOpen={setIsOpen} setSelected={setSelected}> </RecipeItem>))}
         </div>
 
         <ViewRecipe isOpen={isOpen} setIsOpen={setIsOpen} data={selected}

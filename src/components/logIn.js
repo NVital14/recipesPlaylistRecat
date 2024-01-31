@@ -17,8 +17,8 @@ const LogIn = ({ email, setEmail, passord, setPassword }) => {
 
 
     useEffect(() => {
-        setEmail('noemi@gmail.com');
-        setPassword('123456');
+        setEmail('admin@gmail.com');
+        setPassword('admin1');
         window.addEventListener('resize', () => { setWidth(window.innerWidth) });
         window.addEventListener('resize', () => { setHeight(window.innerHeight) });
 
